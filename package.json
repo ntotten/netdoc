@@ -1,0 +1,22 @@
+{
+  "name": "netdoc",
+  "version": "0.1.0",
+  "description": "Generate HTML documents from .NET XML docs files.",
+  "bin": {
+    "netdoc": "./bin/netdoc"
+  },
+  "repository": "https://github.com/ntotten/netdoc.git",
+  "keywords": [
+    "docs"
+  ],
+  "author": "Nathan Totten",
+  "license": "MIT License",
+  "dependencies": {
+    "commander": "~1.1.1",
+    "jade": "~0.29.0",
+    "edge": "~0.7.8"
+  },
+  "scripts" : { 
+    "install" : "tools\\install.bat"
+  }
+}

@@ -1,0 +1,19 @@
+html
+  head
+    title= name+ " Class"
+  body
+    div
+      h1= name + " Class"
+
+
+      if methods.length > 0
+        h2 Methods
+        ul
+          each item in methods
+            li=item.name
+
+      if properties.length > 0
+        h2 Properties
+        ul
+          each item in properties
+            li=item.name
