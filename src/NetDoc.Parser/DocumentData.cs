@@ -26,14 +26,14 @@ namespace NetDoc
     }
 
 
-    public abstract class DocumentDataBase
+    public class DocumentDataObject
     {
         public string Name { get; set; }
         public string FullName { get; set; }
         public string Summary { get; set; }
     }
 
-    public class NamespaceDocumentData : DocumentDataBase
+    public class NamespaceDocumentData : DocumentDataObject
     {
 
         private List<NamedTypeDocumentData> namedTypes = new List<NamedTypeDocumentData>();
@@ -52,7 +52,7 @@ namespace NetDoc
         }
     }
 
-    public class NamedTypeDocumentData : DocumentDataBase
+    public class NamedTypeDocumentData : DocumentDataObject
     {
         private List<MethodDocumentData> methods = new List<MethodDocumentData>();
         private List<PropertyDocumentData> properties = new List<PropertyDocumentData>();
@@ -84,26 +84,33 @@ namespace NetDoc
 
     }
 
-    public class MethodDocumentData : DocumentDataBase
+    public class MethodDocumentData : DocumentDataObject
     {
         public MethodDocumentData()
         {
             this.Parameters = new List<MethodParameterData>();
+            this.TypeArguments = new List<MethodTypeArgumentData>();
         }
 
         public List<MethodParameterData> Parameters { get; private set; }
+        public List<MethodTypeArgumentData> TypeArguments { get; private set; }
     }
 
-    public class PropertyDocumentData : DocumentDataBase
+    public class PropertyDocumentData : DocumentDataObject
     {
 
     }
 
-    public class MethodParameterData : DocumentDataBase
+    public class MethodParameterData : DocumentDataObject
     {
-        public string Type { get; set; }
+        public DocumentDataObject Type { get; set; }
         public bool IsOut { get; set; }
         public bool IsRef { get; set; }
+    }
+
+    public class MethodTypeArgumentData : DocumentDataObject
+    {
+        
     }
 
 }

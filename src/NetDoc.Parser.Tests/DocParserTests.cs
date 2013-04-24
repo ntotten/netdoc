@@ -19,9 +19,8 @@ namespace NetDoc.Parser.Tests
         [Fact]
         public void ParseFilesShouldReturn()
         {
-            var path = @"C:\Users\Nathan\Github\facebook-csharp-sdk\facebook-csharp-sdk\Source\Facebook";
-            var parser = new DocParser();
-            var result = parser.Parse(path);
+            var path = @"D:\Github\facebook-csharp-sdk\facebook-csharp-sdk\Source\Facebook\Facebook-Net45.csproj";
+            var result = DocParser.Parse(path);
             Assert.NotNull(result);
         }
 

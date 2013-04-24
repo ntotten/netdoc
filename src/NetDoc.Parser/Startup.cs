@@ -15,8 +15,7 @@ namespace NetDoc.Parser
             var args = (IDictionary<string, object>)input;
             var path = (string)args["path"];
 
-            var docParser = new DocParser();
-            var data = docParser.Parse(path);
+            var data = DocParser.Parse(path);
             
             var settings = new JsonSerializerSettings();
             settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();

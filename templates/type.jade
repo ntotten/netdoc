@@ -10,7 +10,21 @@ html
         h2 Methods
         ul
           each item in methods
-            li=item.name
+            li
+              span.methodName=item.name
+              if (item.typeArguments.length > 0)
+                span &lt;
+                each arg, i in item.typeArguments
+                  if i > 0
+                    span , 
+                  span=arg.name
+                span &gt;
+              span (
+              each param, i in item.parameters
+                if i > 0
+                  span , 
+                span=param.type.fullName
+              span )
 
       if properties.length > 0
         h2 Properties

@@ -1,4 +1,5 @@
-﻿using Roslyn.Compilers.CSharp;
+﻿using Roslyn.Compilers;
+using Roslyn.Compilers.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,63 +12,144 @@ namespace NetDoc
     public class DocParser
     {
 
-        public DocumentData Parse(string path)
+        public static DocumentData Parse(string projectPath)
         {
-            return Parse(new string[] { path });
+            var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(projectPath);
+            var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
+
+
+            return Parse(compilation);
         }
 
-        public DocumentData Parse(string[] paths)
+        public static DocumentData Parse(CommonCompilation compilation)
         {
-            var validFiles = new List<string>();
+            var data = new DocumentData();
 
-            foreach (var path in paths)
+            var globalNamespace = compilation.GlobalNamespace;
+            var namespaces = globalNamespace.GetNamespaceMembers();
+            foreach (var namespaceSymbol in namespaces)
             {
-                if (Directory.Exists(path))
+                if (namespaceSymbol.Name == "Facebook")
                 {
-                    AddValidFilesInDirectory(path, validFiles);
-                    var directories = Directory.GetDirectories(path);
-                    foreach (var directory in directories)
-                    {
-                        AddValidFilesInDirectory(directory, validFiles);
-                    }
-                }
-                else
-                {
-                    AddValidFile(path, validFiles);
+                    ParseNamespace(data, namespaceSymbol, null);
                 }
             }
 
-            return ParseFiles(validFiles.ToArray());
+            return data;
         }
 
-        private static void AddValidFilesInDirectory(string path, List<string> validFiles)
+        private static T CreateDocumentData<T>(ISymbol symbol, string rootName) where T : DocumentDataObject, new()
         {
-            var files = Directory.GetFiles(path);
-            foreach (var file in files)
+            var data = new T();
+            data.Name = symbol.Name;
+
+            if (string.IsNullOrEmpty(rootName))
             {
-                AddValidFile(file, validFiles);
+                data.FullName = data.Name;
+            }
+            else
+            {
+                data.FullName = rootName + "." + data.Name;
+            }
+
+            DocumentationComment comment = null;
+            try
+            {
+                comment = symbol.GetDocumentationComment();
+            }
+            catch
+            {
+
+            }
+            if (comment != null)
+            {
+                data.Summary = comment.SummaryTextOpt;
+            }
+            return data;
+        }
+
+        private static void ParseNamespace(DocumentData parent, INamespaceSymbol symbol, string rootName)
+        {
+            var data = CreateDocumentData<NamespaceDocumentData>(symbol, rootName);
+            parent.AddNamespace(data);
+
+
+            // Namespaces
+            var namespaces = symbol.GetNamespaceMembers();
+            foreach (var namespaceSymbol in namespaces)
+            {
+                ParseNamespace(parent, namespaceSymbol, rootName: data.Name);
+            }
+
+            // Types
+            var typeMembers = symbol.GetTypeMembers();
+            foreach (var typeMember in typeMembers)
+            {
+                ParseTypeMember(data, typeMember, data.FullName);
             }
         }
 
-        private static void AddValidFile(string file, List<string> validFiles)
+        private static void ParseTypeMember(NamespaceDocumentData parent, INamedTypeSymbol symbol, string rootName)
         {
-            if (Path.GetExtension(file) == ".cs")
+            var data = CreateDocumentData<NamedTypeDocumentData>(symbol, rootName);
+            parent.AddNamedType(data);
+
+            // Process Members
+            var members = symbol.GetMembers();
+            foreach (var member in members)
             {
-                validFiles.Add(file);
+                switch (member.Kind)
+                {
+                    case CommonSymbolKind.Method:
+
+                        ParseMethod(data, (IMethodSymbol)member, data.FullName);
+                        break;
+                    case CommonSymbolKind.Property:
+
+                        ParseProperty(data, (IPropertySymbol)member, data.FullName);
+                        break;
+                }
             }
         }
 
-        private DocumentData ParseFiles(string[] paths)
+        private static void ParseMethod(NamedTypeDocumentData parent, IMethodSymbol symbol, string rootName)
         {
-            var trees = new List<SyntaxTree>();
-            foreach (var path in paths)
+            if (symbol.AssociatedPropertyOrEvent != null)
             {
-                var tree = SyntaxTree.ParseFile(path);
-                trees.Add(tree);
-            };
+                // We don't want to include methods that are associated with
+                // events or properties.
+                return;
+            }
+            var data = CreateDocumentData<MethodDocumentData>(symbol, rootName);
+            parent.AddMethod(data);
 
-            return TreeParser.Parse(trees);
+            var parameters = symbol.Parameters;
+            foreach (var parameter in parameters)
+            {
+                var parameterData = CreateDocumentData<MethodParameterData>(parameter, null);
+                parameterData.Name = parameter.Name;
+                parameterData.Type = new DocumentDataObject()
+                {
+                    Name = parameter.Type.Name,
+                    FullName = parameter.Type.ToDisplayString()
+                };
+                data.Parameters.Add(parameterData);
+            }
+
+            var typeArguments = symbol.TypeArguments;
+            foreach (var typeArgument in typeArguments)
+            {
+                var typeArgumentData = CreateDocumentData<MethodTypeArgumentData>(typeArgument, null);
+                data.TypeArguments.Add(typeArgumentData);
+            }
+        }
+
+        private static void ParseProperty(NamedTypeDocumentData parent, IPropertySymbol symbol, string rootName)
+        {
+            var data = CreateDocumentData<PropertyDocumentData>(symbol, rootName);
+            parent.AddProperty(data);
         }
 
     }
+
 }
