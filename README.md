@@ -9,7 +9,22 @@ This project uses Node.js for the command line interface. To install use npm.
 
 ## Use
 
+    // Generates docs from a csproj file
     netdoc <inputPath> <outputPath>
 
     example:
     netdoc .\Source\MyProject.csproj .\docs\
+
+
+    // Create a json document use to generate the docs
+    netdoc json <inputPath> <outputPath> 
+
+    example:
+    netdoc .\Source\MyProject.csproj .\docs\data.json
+
+
+    // Generates docs from a json file
+    netdoc gen <inputPath> <outputPath>
+
+    example:
+    netdoc .\docs\data.json .\docs\ 
