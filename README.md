@@ -10,3 +10,6 @@ This project uses Node.js for the command line interface. To install use npm.
 ## Use
 
     netdoc <inputPath> <outputPath>
+
+    example:
+    netdoc .\Source\MyProject.csproj .\docs\
