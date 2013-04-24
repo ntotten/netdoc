@@ -111,6 +111,18 @@ namespace NetDoc
             }
             var data = CreateDocumentData<MethodDocumentData>(symbol, rootName);
             parent.AddMethod(data);
+
+            var parameters = symbol.Parameters;
+            foreach (var parameter in parameters)
+            {
+                var parameterData = new MethodParameterData
+                {
+                    Name = parameter.Name,
+                };
+                parameterData.Type = parameter.Type.Name;
+                data.Parameters.Add(parameterData);
+            }
+
         }
 
         private static void ParseProperty(NamedTypeDocumentData parent, PropertySymbol symbol, string rootName)

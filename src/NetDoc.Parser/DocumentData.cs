@@ -86,12 +86,24 @@ namespace NetDoc
 
     public class MethodDocumentData : DocumentDataBase
     {
+        public MethodDocumentData()
+        {
+            this.Parameters = new List<MethodParameterData>();
+        }
 
+        public List<MethodParameterData> Parameters { get; private set; }
     }
 
     public class PropertyDocumentData : DocumentDataBase
     {
 
+    }
+
+    public class MethodParameterData : DocumentDataBase
+    {
+        public string Type { get; set; }
+        public bool IsOut { get; set; }
+        public bool IsRef { get; set; }
     }
 
 }
