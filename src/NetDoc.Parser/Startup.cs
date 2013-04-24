@@ -19,7 +19,7 @@ namespace NetDoc.Parser
             
             var settings = new JsonSerializerSettings();
             settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
-            string json = await JsonConvert.SerializeObjectAsync(data, Formatting.None, settings);
+            string json = await JsonConvert.SerializeObjectAsync(data, Formatting.Indented, settings);
             return json;
         }
 

@@ -42,6 +42,12 @@ namespace NetDoc
         {
             var data = new T();
             data.Name = symbol.Name;
+            data.DisplayName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+
+            if (rootName != null)
+            {
+                data.DisplayName = data.DisplayName.Replace(rootName, string.Empty).Substring(1);
+            }
 
             if (string.IsNullOrEmpty(rootName))
             {
@@ -127,12 +133,7 @@ namespace NetDoc
             foreach (var parameter in parameters)
             {
                 var parameterData = CreateDocumentData<MethodParameterData>(parameter, null);
-                parameterData.Name = parameter.Name;
-                parameterData.Type = new DocumentDataObject()
-                {
-                    Name = parameter.Type.Name,
-                    FullName = parameter.Type.ToDisplayString()
-                };
+                parameterData.Type = CreateDocumentData<DocumentDataObject>(parameter.Type, null);
                 data.Parameters.Add(parameterData);
             }
 

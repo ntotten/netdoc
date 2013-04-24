@@ -8,26 +8,37 @@ html
 
       if methods.length > 0
         h2 Methods
-        ul
+        table
           each item in methods
-            li
-              span.methodName=item.name
-              if (item.typeArguments.length > 0)
-                span &lt;
-                each arg, i in item.typeArguments
-                  if i > 0
-                    span , 
-                  span=arg.name
-                span &gt;
-              span (
-              each param, i in item.parameters
-                if i > 0
-                  span , 
-                span=param.type.fullName
-              span )
+            tr
+              td
+                a(href="#")
+                  span.methodName=item.name
+                  if (item.typeArguments.length > 0)
+                    span &lt;
+                    each arg, i in item.typeArguments
+                      if i > 0
+                        span , 
+                      span=arg.name
+                    span &gt;
+                  span (
+                  if (item.parameters.length > 0)
+                    each param, i in item.parameters
+                      if i > 0
+                        span , 
+                      span=param.type.displayName
+                  span )
+              td!=item.summary
 
       if properties.length > 0
         h2 Properties
-        ul
+        table
           each item in properties
-            li=item.name
+            tr
+              td=item.name
+              td!=item.summary
+    script
+      var sees = document.getElementsByTagName('see');
+      for (var i = 0; i < sees.length; i++) {
+        console.log(sees[i].getAttribute('cref'));
+      }
