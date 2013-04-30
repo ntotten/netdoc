@@ -1,0 +1,7 @@
+if properties.length > 0
+        h2 Properties
+        table
+          each item in properties
+            tr
+              td=item.name
+              td!=item.summary
