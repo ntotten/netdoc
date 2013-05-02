@@ -17,11 +17,14 @@ namespace NetDoc
             var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(projectPath);
             var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
 
+            var namespacesBegins = new string[] {
+                "Facebook"
+            }.AsEnumerable();
 
-            return Parse(compilation);
+            return Parse(compilation, namespacesBegins);
         }
 
-        public static DocumentData Parse(CommonCompilation compilation)
+        public static DocumentData Parse(CommonCompilation compilation, IEnumerable<string> namespacesBegins)
         {
             var data = new DocumentData();
 
@@ -29,7 +32,7 @@ namespace NetDoc
             var namespaces = globalNamespace.GetNamespaceMembers();
             foreach (var namespaceSymbol in namespaces)
             {
-                if (namespaceSymbol.Name == "Facebook")
+                if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => namespaceSymbol.Name.StartsWith(n)))
                 {
                     ParseNamespace(data, namespaceSymbol, null);
                 }
@@ -70,6 +73,7 @@ namespace NetDoc
             if (comment != null)
             {
                 data.Summary = comment.SummaryTextOpt;
+                data.FullXMLComment = comment.FullXmlFragmentOpt;
             }
             return data;
         }
@@ -106,6 +110,14 @@ namespace NetDoc
             {
                 switch (member.Kind)
                 {
+                    case CommonSymbolKind.Field:
+
+                        ParseField(data, (IFieldSymbol)member, data.FullName);
+                        break;
+                    case CommonSymbolKind.Event:
+
+                        ParseEvent(data, (IEventSymbol)member, data.FullName);
+                        break;
                     case CommonSymbolKind.Method:
 
                         ParseMethod(data, (IMethodSymbol)member, data.FullName);
@@ -118,6 +130,30 @@ namespace NetDoc
             }
         }
 
+        private static void ParseEvent(NamedTypeDocumentData parent, IEventSymbol symbol, string rootName)
+        {
+            if (symbol.DeclaredAccessibility != CommonAccessibility.Private)
+            {
+
+            }
+
+            //throw new NotImplementedException();
+        }
+
+        private static void ParseField(NamedTypeDocumentData parent, IFieldSymbol symbol, string rootName)
+        {
+            if (symbol.DeclaredAccessibility == CommonAccessibility.Private || !symbol.IsConst)
+            {
+                return;
+            }
+
+            var data = CreateDocumentData<ConstantDocumentData>(symbol, rootName);
+            data.Value = symbol.ConstantValue.ToString();
+            parent.AddConstant(data);
+
+            //throw new NotImplementedException();
+        }
+
         private static void ParseMethod(NamedTypeDocumentData parent, IMethodSymbol symbol, string rootName)
         {
             if (symbol.AssociatedPropertyOrEvent != null)
@@ -126,8 +162,18 @@ namespace NetDoc
                 // events or properties.
                 return;
             }
+
             var data = CreateDocumentData<MethodDocumentData>(symbol, rootName);
-            parent.AddMethod(data);
+            if (symbol.MethodKind == CommonMethodKind.Constructor || symbol.MethodKind == CommonMethodKind.StaticConstructor)
+            {
+                data.ReturnType = null;
+                parent.AddConstructor(data);
+            }
+            else
+            {
+                data.ReturnType = CreateDocumentData<DocumentDataObject>(symbol.ReturnType, null);
+                parent.AddMethod(data);
+            }
 
             var parameters = symbol.Parameters;
             foreach (var parameter in parameters)
@@ -148,6 +194,7 @@ namespace NetDoc
         private static void ParseProperty(NamedTypeDocumentData parent, IPropertySymbol symbol, string rootName)
         {
             var data = CreateDocumentData<PropertyDocumentData>(symbol, rootName);
+            data.Type = CreateDocumentData<DocumentDataObject>(symbol.Type, null);
             parent.AddProperty(data);
         }
 

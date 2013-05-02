@@ -32,6 +32,7 @@ namespace NetDoc
         public string FullName { get; set; }
         public string DisplayName { get; set; }
         public string Summary { get; set; }
+        public string FullXMLComment { get; set; }
     }
 
     public class NamespaceDocumentData : DocumentDataObject
@@ -55,17 +56,53 @@ namespace NetDoc
 
     public class NamedTypeDocumentData : DocumentDataObject
     {
-        private List<MethodDocumentData> methods = new List<MethodDocumentData>();
+        private List<ConstantDocumentData> constants = new List<ConstantDocumentData>();
+        private List<MethodDocumentData> constructors = new List<MethodDocumentData>();
         private List<PropertyDocumentData> properties = new List<PropertyDocumentData>();
+        private List<MethodDocumentData> methods = new List<MethodDocumentData>();
+
+        public void AddConstant(ConstantDocumentData data)
+        {
+            this.constants.Add(data);
+        }
+
+        public void AddConstructor(MethodDocumentData data)
+        {
+            this.constructors.Add(data);
+        }
+
+        public void AddProperty(PropertyDocumentData data)
+        {
+            this.properties.Add(data);
+        }
 
         public void AddMethod(MethodDocumentData data)
         {
             this.methods.Add(data);
         }
 
-        public void AddProperty(PropertyDocumentData data)
+        public IEnumerable<ConstantDocumentData> Constants
         {
-            this.properties.Add(data);
+            get
+            {
+                return this.constants.OrderBy(m => m.Name).ToArray();
+            }
+        }
+
+        public IEnumerable<MethodDocumentData> Constructors
+        {
+            get
+            {
+                return this.constructors.OrderBy(m => m.Name).ToArray();
+            }
+        }
+
+        public IEnumerable<PropertyDocumentData> Properties
+        {
+            get
+            {
+                return this.properties.OrderBy(m => m.Name).ToArray();
+            }
         }
 
         public IEnumerable<MethodDocumentData> Methods
@@ -75,14 +112,17 @@ namespace NetDoc
                 return this.methods.OrderBy(m => m.Name).ToArray();
             }
         }
-        public IEnumerable<PropertyDocumentData> Properties
-        {
-            get
-            {
-                return this.properties.OrderBy(m => m.Name).ToArray();
-            }
-        }
 
+    }
+
+    public class ConstantDocumentData : DocumentDataObject
+    {
+        public string Value { get; set; }
+    }
+
+    public class PropertyDocumentData : DocumentDataObject
+    {
+        public DocumentDataObject Type { get; set; }
     }
 
     public class MethodDocumentData : DocumentDataObject
@@ -95,11 +135,8 @@ namespace NetDoc
 
         public List<MethodParameterData> Parameters { get; private set; }
         public List<MethodTypeArgumentData> TypeArguments { get; private set; }
-    }
 
-    public class PropertyDocumentData : DocumentDataObject
-    {
-
+        public DocumentDataObject ReturnType { get; set; }
     }
 
     public class MethodParameterData : DocumentDataObject
