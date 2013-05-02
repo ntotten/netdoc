@@ -1,11 +1,7 @@
-h5 Facebook
-h6 
-  a(href="#") test
-h6 
-  a(href="#") test 2
-h5 Client
-h6 
-  a(href="#") test client
-h6 
-  a(href="#") test client 2
+each item in generalIndex
+  h5=item.namespace
+  each type in item.types
+    h6 
+      a(href="#")=type
+
 h5 Quick Links
