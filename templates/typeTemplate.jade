@@ -1,0 +1,10 @@
+extends sidebarLayout
+
+block contentBody
+  .header
+    h1= name + " Class"
+  #doc
+    include includes/propertiesSummary
+    include includes/methodSummary
+    hr
+    include includes/details
