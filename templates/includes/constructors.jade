@@ -1,0 +1,7 @@
+if locals.constructors && constructors.length > 0
+  div.referenceTitle Constructors
+  table
+    each item in constructors
+      tr
+        td=item.name
+        td!=item.summary

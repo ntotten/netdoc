@@ -1,10 +1,7 @@
 if locals.properties && properties.length > 0
+  h2 Properties
   table
-    tr
-      th Properties
     each item in properties
       tr
-        td
-          a(href="#")
-            span.propertyName=item.name
+        td=item.name
         td!=item.summary
