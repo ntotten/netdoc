@@ -1,7 +1,20 @@
 if methods.length > 0
   div.referenceTitle Methods
-  table
-    each item in methods
-      tr
-        td=item.name
-        td!=item.summary
+  each item in methods
+    div.itemDetails
+      div.itemDetailsTitle=item.name
+        if (item.typeArguments.length > 0)
+          span &lt;
+          each arg, i in item.typeArguments
+            if i > 0
+              span , 
+            span=arg.name
+          span &gt;
+        span (
+        if (item.parameters.length > 0)
+          each param, i in item.parameters
+            if i > 0
+              span , 
+            span=param.type.displayName
+        span )
+      div.itemDetailsDescription!=item.summary

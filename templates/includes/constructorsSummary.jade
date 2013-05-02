@@ -5,6 +5,20 @@ if locals.constructors && constructors.length > 0
     each item in constructors
       tr
         td
-          a(href="#")
-            span.propertyName=item.name
-        td!=item.summary
+          span.itemName
+            a(href="#")=item.name
+            if (item.typeArguments.length > 0)
+              span &lt;
+              each arg, i in item.typeArguments
+                if i > 0
+                  span , 
+                span=arg.name
+              span &gt;
+            span (
+            if (item.parameters.length > 0)
+              each param, i in item.parameters
+                if i > 0
+                  span , 
+                span=param.type.displayName
+            span )
+          div.itemSummary!=item.summary

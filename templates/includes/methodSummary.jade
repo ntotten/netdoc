@@ -1,11 +1,15 @@
-if methods.length > 0
-  h2 Methods
+if locals.methods && methods.length > 0
   table
+    tr
+      th(colspan='2') Methods
     each item in methods
       tr
         td
-          a(href="#")
-            span.methodName=item.name
+          span
+           item.type
+        td
+          span.itemName
+            a(href="#")=item.name
             if (item.typeArguments.length > 0)
               span &lt;
               each arg, i in item.typeArguments
@@ -20,4 +24,4 @@ if methods.length > 0
                   span , 
                 span=param.type.displayName
             span )
-        td!=item.summary
+          div.itemSummary!=item.summary

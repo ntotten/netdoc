@@ -1,10 +1,13 @@
 if locals.properties && properties.length > 0
   table
     tr
-      th Properties
+      th(colspan='2') Properties
     each item in properties
       tr
         td
-          a(href="#")
-            span.propertyName=item.name
-        td!=item.summary
+          span
+           item.type
+        td
+          span.itemName
+            a(href="#")=item.name
+          div.itemSummary!=item.summary

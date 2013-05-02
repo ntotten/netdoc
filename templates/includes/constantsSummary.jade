@@ -1,10 +1,13 @@
 if locals.constants && constants.length > 0
   table
     tr
-      th Constants
+      th(colspan='2') Constants
     each item in constants
       tr
         td
-          a(href="#")
-            span.propertyName=item.name
-        td!=item.summary
+          span
+           item.type
+        td
+          span.itemName
+           a(href="#")=item.name
+          div.itemSummary!=item.summary
