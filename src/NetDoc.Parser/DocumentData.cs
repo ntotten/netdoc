@@ -32,7 +32,7 @@ namespace NetDoc
         public string FullName { get; set; }
         public string DisplayName { get; set; }
         public string Summary { get; set; }
-        public string FullXMLComment { get; set; }
+        public string ReturnDescription { get; set; }
     }
 
     public class NamespaceDocumentData : DocumentDataObject

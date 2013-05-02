@@ -18,3 +18,10 @@ if locals.constructors && constructors.length > 0
             span=param.type.displayName
         span )
       div.itemDetailsDescription!=item.summary
+        if (item.parameters.length > 0)
+          div.params
+            span.paramsTitle Parameters
+            each param, i in item.parameters
+              div.paramDesc
+                span.paramName=param.name
+                param.summary

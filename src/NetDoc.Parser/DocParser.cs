@@ -73,7 +73,7 @@ namespace NetDoc
             if (comment != null)
             {
                 data.Summary = comment.SummaryTextOpt;
-                data.FullXMLComment = comment.FullXmlFragmentOpt;
+                data.ReturnDescription = comment.ReturnsTextOpt;
             }
             return data;
         }
