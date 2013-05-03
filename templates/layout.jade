@@ -70,9 +70,4 @@ head
       $(document).ready(function() {
       $('code').addClass('prettyprint');
       prettyPrint();
-      $('#doc h2').each(function(i, element) {
-      var h2 = $(element);
-      $('<h6><a href="#' + i + '">' + h2.text() + '</a></h6>').appendTo('#toc');
-      h2.after($('<a id="' + i + '" />'));
-      });
       });
