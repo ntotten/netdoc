@@ -27,8 +27,8 @@ if methods.length > 0
             each param, i in item.parameters
               div.paramDesc
                 span.paramName=param.name
-                param.summary
+                div.paramSummary=param.summary
         if (item.returnDescription)
           div.return
             span.returnTitle Returns
-              div.returnDesc=item.returnDescription
+            div.returnDesc!=item.returnDescription
