@@ -28,8 +28,7 @@ if methods.length > 0
               div.paramDesc
                 span.paramName=param.name
                 param.summary
-        if (item.returnType && item.returnType.summary)
+        if (item.returnDescription)
           div.return
             span.returnTitle Returns
-              div.returnDesc
-                item.returnType.summary
+              div.returnDesc=item.returnDescription
