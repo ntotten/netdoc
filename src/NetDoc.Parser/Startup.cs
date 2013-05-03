@@ -1,15 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NetDoc.Parser
+﻿namespace NetDoc.Parser
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Newtonsoft.Json;
+
     public class Startup
     {
-
         public async Task<object> Invoke(object input)
         {
             var args = (IDictionary<string, object>)input;
@@ -22,6 +18,5 @@ namespace NetDoc.Parser
             string json = await JsonConvert.SerializeObjectAsync(data, Formatting.Indented, settings);
             return json;
         }
-
     }
 }

@@ -1,23 +1,20 @@
-﻿using Roslyn.Compilers;
-using Roslyn.Compilers.Common;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NetDoc
+﻿namespace NetDoc
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using NetDoc.Parser.DocumentData;
+    using Roslyn.Compilers;
+    using Roslyn.Compilers.Common;
+
     public class DocParser
     {
-
         public static DocumentData Parse(string projectPath)
         {
             var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(projectPath);
             var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
 
-            var namespacesBegins = new string[] {
+            var namespacesBegins = new string[] 
+            {
                 "Facebook"
             }.AsEnumerable();
 
@@ -68,13 +65,14 @@ namespace NetDoc
             }
             catch
             {
-
             }
+
             if (comment != null)
             {
                 data.Summary = comment.SummaryTextOpt;
                 data.ReturnDescription = comment.ReturnsTextOpt;
             }
+
             return data;
         }
 
@@ -82,7 +80,6 @@ namespace NetDoc
         {
             var data = CreateDocumentData<NamespaceDocumentData>(symbol, rootName);
             parent.AddNamespace(data);
-
 
             // Namespaces
             var namespaces = symbol.GetNamespaceMembers();
@@ -101,6 +98,11 @@ namespace NetDoc
 
         private static void ParseTypeMember(NamespaceDocumentData parent, INamedTypeSymbol symbol, string rootName)
         {
+            if (symbol.DeclaredAccessibility == CommonAccessibility.Private)
+            {
+                return;
+            }
+
             var data = CreateDocumentData<NamedTypeDocumentData>(symbol, rootName);
             parent.AddNamedType(data);
 
@@ -132,12 +134,13 @@ namespace NetDoc
 
         private static void ParseEvent(NamedTypeDocumentData parent, IEventSymbol symbol, string rootName)
         {
-            if (symbol.DeclaredAccessibility != CommonAccessibility.Private)
+            if (symbol.DeclaredAccessibility == CommonAccessibility.Private)
             {
-
+                return;
             }
 
-            //throw new NotImplementedException();
+            var data = CreateDocumentData<EventDocumentData>(symbol, rootName);
+            parent.AddEvent(data);
         }
 
         private static void ParseField(NamedTypeDocumentData parent, IFieldSymbol symbol, string rootName)
@@ -150,8 +153,6 @@ namespace NetDoc
             var data = CreateDocumentData<ConstantDocumentData>(symbol, rootName);
             data.Value = symbol.ConstantValue.ToString();
             parent.AddConstant(data);
-
-            //throw new NotImplementedException();
         }
 
         private static void ParseMethod(NamedTypeDocumentData parent, IMethodSymbol symbol, string rootName)
@@ -160,6 +161,11 @@ namespace NetDoc
             {
                 // We don't want to include methods that are associated with
                 // events or properties.
+                return;
+            }
+
+            if (symbol.DeclaredAccessibility == CommonAccessibility.Private)
+            {
                 return;
             }
 
@@ -193,11 +199,14 @@ namespace NetDoc
 
         private static void ParseProperty(NamedTypeDocumentData parent, IPropertySymbol symbol, string rootName)
         {
+            if (symbol.DeclaredAccessibility == CommonAccessibility.Private)
+            {
+                return;
+            }
+
             var data = CreateDocumentData<PropertyDocumentData>(symbol, rootName);
             data.Type = CreateDocumentData<DocumentDataObject>(symbol.Type, null);
             parent.AddProperty(data);
         }
-
     }
-
 }

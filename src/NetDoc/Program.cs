@@ -1,15 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NetDoc
+﻿namespace NetDoc
 {
-    class Program
+    using System.Collections.Generic;
+    using NetDoc.Parser;
+
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            var input = new Dictionary<string, object>();
+            input.Add("path", "F:\\r\\facebooksdk\\forks\\facebook-csharp-sdk\\Source\\Facebook\\Facebook-Net45.csproj");
+            
+            ////input.Add("path", "F:\\r\\facebooksdk\\forks\\facebook-winclient-sdk\\Source\\Facebook.Client-WindowsStore\\Facebook.Client-WindowsStore.csproj");
+            var netDoc = new Startup();
+            var task = netDoc.Invoke(input);
+            task.Wait();
+            var results = task.Result;
         }
     }
 }

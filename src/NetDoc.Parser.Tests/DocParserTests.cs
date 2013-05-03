@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace NetDoc.Parser.Tests
+﻿namespace NetDoc.Parser.Tests
 {
+    using Xunit;
+
     public class DocParserTests
     {
-
         [Fact]
         public void ParseTextShouldReturn()
         {
-
         }
 
         [Fact]
@@ -23,6 +16,5 @@ namespace NetDoc.Parser.Tests
             var result = DocParser.Parse(path);
             Assert.NotNull(result);
         }
-
     }
 }
