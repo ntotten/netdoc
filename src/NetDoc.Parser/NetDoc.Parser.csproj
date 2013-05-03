@@ -70,6 +70,7 @@
     <Compile Include="DocumentData\DocumentData.cs" />
     <Compile Include="DocumentData\DocumentDataObject.cs" />
     <Compile Include="DocumentData\EventDocumentData.cs" />
+    <Compile Include="DocumentData\IdentificableDocumentDataObject.cs" />
     <Compile Include="DocumentData\MethodDocumentData.cs" />
     <Compile Include="DocumentData\MethodParameterData.cs" />
     <Compile Include="DocumentData\MethodTypeArgumentData.cs" />

@@ -170,16 +170,6 @@
             }
 
             var data = CreateDocumentData<MethodDocumentData>(symbol, rootName);
-            if (symbol.MethodKind == CommonMethodKind.Constructor || symbol.MethodKind == CommonMethodKind.StaticConstructor)
-            {
-                data.ReturnType = null;
-                parent.AddConstructor(data);
-            }
-            else
-            {
-                data.ReturnType = CreateDocumentData<DocumentDataObject>(symbol.ReturnType, null);
-                parent.AddMethod(data);
-            }
 
             var parameters = symbol.Parameters;
             foreach (var parameter in parameters)
@@ -194,6 +184,17 @@
             {
                 var typeArgumentData = CreateDocumentData<MethodTypeArgumentData>(typeArgument, null);
                 data.TypeArguments.Add(typeArgumentData);
+            }
+
+            if (symbol.MethodKind == CommonMethodKind.Constructor || symbol.MethodKind == CommonMethodKind.StaticConstructor)
+            {
+                data.ReturnType = null;
+                parent.AddConstructor(data);
+            }
+            else
+            {
+                data.ReturnType = CreateDocumentData<DocumentDataObject>(symbol.ReturnType, null);
+                parent.AddMethod(data);
             }
         }
 

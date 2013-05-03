@@ -17,6 +17,7 @@
 
         public void AddNamedType(NamedTypeDocumentData data)
         {
+            data.GenerateId();
             this.namedTypes.Add(data);
         }
     }
