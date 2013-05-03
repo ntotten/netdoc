@@ -1,0 +1,13 @@
+extends sidebarLayout
+
+block contentBody
+  .header
+    h1= "Facebook SDK for .NET Reference"
+  #doc
+    each item in index
+      div.namespaceCol
+        div.namespaceName=item.namespace
+        ul
+          each type in item.types
+            li 
+              a(href=type.fullName + '.html', title=type.fullName)=type.name
