@@ -1,0 +1,10 @@
+if locals.events && events.length > 0
+  table
+    tr
+      th Events
+    each item in events
+      tr
+        td
+          span.itemName
+            a(href="#")=item.name
+          div.itemSummary!=item.summary
