@@ -1,6 +1,6 @@
 if locals.events && events.length > 0
   div.referenceTitle events
   each item in events
-    div.itemDetails
+    div.itemDetails(id=item.id)
       div.itemDetailsTitle=item.name
       div.itemDetailsDescription!=item.summary

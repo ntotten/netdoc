@@ -9,7 +9,7 @@ if locals.methods && methods.length > 0
            item.type= item.returnType.displayName
         td
           span.itemName
-            a(href="#")=item.name
+            a(href="#"+item.id)=item.name
             if (item.typeArguments.length > 0)
               span &lt;
               each arg, i in item.typeArguments

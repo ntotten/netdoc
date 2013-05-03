@@ -6,7 +6,7 @@ if locals.constructors && constructors.length > 0
       tr
         td
           span.itemName
-            a(href="#")=item.name
+            a(href="#"+item.id)=item.name
             if (item.typeArguments.length > 0)
               span &lt;
               each arg, i in item.typeArguments

@@ -1,7 +1,7 @@
 if locals.constructors && constructors.length > 0
   div.referenceTitle Constructors
   each item in constructors
-    div.itemDetails
+    div.itemDetails(id=item.id)
       div.itemDetailsTitle=item.name
         if (item.typeArguments.length > 0)
           span &lt;

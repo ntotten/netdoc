@@ -1,6 +1,6 @@
 if locals.constants && constants.length > 0
   div.referenceTitle Constants
   each item in constants
-    div.itemDetails
+    div.itemDetails(id=item.id)
       div.itemDetailsTitle=item.name
       div.itemDetailsDescription!=item.summary

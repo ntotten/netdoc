@@ -9,5 +9,5 @@ if locals.constants && constants.length > 0
            item.type
         td
           span.itemName
-           a(href="#")=item.name
+           a(href="#"+item.id)=item.name
           div.itemSummary!=item.summary

@@ -9,5 +9,5 @@ if locals.properties && properties.length > 0
            item.type= item.type.displayName
         td
           span.itemName
-            a(href="#")=item.name
+            a(href="#"+item.id)=item.name
           div.itemSummary!=item.summary

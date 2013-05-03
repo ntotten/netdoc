@@ -6,5 +6,5 @@ if locals.events && events.length > 0
       tr
         td
           span.itemName
-            a(href="#")=item.name
+            a(href="#"+item.id)=item.name
           div.itemSummary!=item.summary

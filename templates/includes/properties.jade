@@ -1,6 +1,6 @@
 if locals.properties && properties.length > 0
   div.referenceTitle Properties
   each item in properties
-    div.itemDetails
+    div.itemDetails(id=item.id)
       div.itemDetailsTitle=item.name
       div.itemDetailsDescription!=item.summary

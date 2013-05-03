@@ -1,7 +1,7 @@
 if methods.length > 0
   div.referenceTitle Methods
   each item in methods
-    div.itemDetails
+    div.itemDetails(id=item.id)
       div.itemDetailsTitle
         if (item.returnType)
           span=item.returnType.name + " "
