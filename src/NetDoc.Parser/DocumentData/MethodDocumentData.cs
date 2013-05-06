@@ -1,8 +1,10 @@
-﻿namespace NetDoc.Parser.DocumentData
+﻿namespace NetDoc.Parser.Model
 {
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
 
-    public class MethodDocumentData : IdentificableDocumentDataObject
+    public class MethodDocumentData : DocumentDataObjectWithId
     {
         public MethodDocumentData()
         {
@@ -10,9 +12,9 @@
             this.TypeArguments = new List<MethodTypeArgumentData>();
         }
 
-        public List<MethodParameterData> Parameters { get; private set; }
+        public ICollection<MethodParameterData> Parameters { get; private set; }
 
-        public List<MethodTypeArgumentData> TypeArguments { get; private set; }
+        public ICollection<MethodTypeArgumentData> TypeArguments { get; private set; }
 
         public DocumentDataObject ReturnType { get; set; }
 
@@ -20,19 +22,19 @@
         {
             this.Id = this.Name;
 
-            if (this.TypeArguments.Count > 0)
+            if (this.TypeArguments.Count() > 0)
             {
                 this.Id += "_";
             }
 
             foreach (var arg in this.TypeArguments)
             {
-                this.Id += string.Format("{0}_", arg.Name);
+                this.Id += string.Format(CultureInfo.InvariantCulture, "{0}_", arg.Name);
             }
 
             this.Id += "(";
 
-            if (this.Parameters.Count > 0)
+            if (this.Parameters.Count() > 0)
             {
                 var types = new List<string>();
 

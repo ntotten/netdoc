@@ -1,9 +1,9 @@
-﻿namespace NetDoc.Parser.DocumentData
+﻿namespace NetDoc.Parser.Model
 {
     using System.Collections.Generic;
     using System.Linq;
 
-    public class NamedTypeDocumentData : IdentificableDocumentDataObject
+    public class NamedTypeDocumentData : DocumentDataObjectWithId
     {
         private List<ConstantDocumentData> constants = new List<ConstantDocumentData>();
         private List<MethodDocumentData> constructors = new List<MethodDocumentData>();
@@ -53,32 +53,47 @@
 
         public void AddConstant(ConstantDocumentData data)
         {
-            data.GenerateId();
-            this.constants.Add(data);
+            if (data != null)
+            {
+                data.GenerateId();
+                this.constants.Add(data);
+            }
         }
 
         public void AddConstructor(MethodDocumentData data)
         {
-            data.GenerateId();
-            this.constructors.Add(data);
+            if (data != null)
+            {
+                data.GenerateId();
+                this.constructors.Add(data);
+            }
         }
 
         public void AddProperty(PropertyDocumentData data)
         {
-            data.GenerateId();
-            this.properties.Add(data);
+            if (data != null)
+            {
+                data.GenerateId();
+                this.properties.Add(data);
+            }
         }
 
         public void AddMethod(MethodDocumentData data)
         {
-            data.GenerateId();
-            this.methods.Add(data);
+            if (data != null)
+            {
+                data.GenerateId();
+                this.methods.Add(data);
+            }
         }
 
         public void AddEvent(EventDocumentData data)
         {
-            data.GenerateId();
-            this.events.Add(data);
+            if (data != null)
+            {
+                data.GenerateId();
+                this.events.Add(data);
+            }
         }
 
         public override void GenerateId()

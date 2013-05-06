@@ -1,6 +1,6 @@
-﻿namespace NetDoc.Parser.DocumentData
+﻿namespace NetDoc.Parser.Model
 {
-    public class EventDocumentData : IdentificableDocumentDataObject
+    public class EventDocumentData : DocumentDataObjectWithId
     {
         public override void GenerateId()
         {

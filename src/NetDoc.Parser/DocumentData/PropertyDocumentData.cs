@@ -1,6 +1,6 @@
-﻿namespace NetDoc.Parser.DocumentData
+﻿namespace NetDoc.Parser.Model
 {
-    public class PropertyDocumentData : IdentificableDocumentDataObject
+    public class PropertyDocumentData : DocumentDataObjectWithId
     {
         public DocumentDataObject Type { get; set; }
 

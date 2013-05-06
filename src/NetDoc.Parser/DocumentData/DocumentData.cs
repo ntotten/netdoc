@@ -1,4 +1,4 @@
-﻿namespace NetDoc.Parser.DocumentData
+﻿namespace NetDoc.Parser.Model
 {
     using System.Collections.Generic;
 
@@ -16,8 +16,11 @@
 
         public void AddNamespace(NamespaceDocumentData data)
         {
-            var key = data.Name ?? string.Empty;
-            this.namespaces.Add(key, data);
+            if (data != null)
+            {
+                var key = data.Name ?? string.Empty;
+                this.namespaces.Add(key, data);
+            }
         }
     }
 }

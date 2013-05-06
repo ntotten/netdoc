@@ -1,12 +1,13 @@
 ﻿namespace NetDoc
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using NetDoc.Parser.DocumentData;
+    using NetDoc.Parser.Model;
     using Roslyn.Compilers;
     using Roslyn.Compilers.Common;
 
-    public class DocParser
+    public static class DocParser
     {
         public static DocumentData Parse(string projectPath)
         {
@@ -23,13 +24,18 @@
 
         public static DocumentData Parse(CommonCompilation compilation, IEnumerable<string> namespacesBegins)
         {
+            if (compilation == null)
+            {
+                throw new ArgumentNullException("compilation");
+            }
+
             var data = new DocumentData();
 
             var globalNamespace = compilation.GlobalNamespace;
             var namespaces = globalNamespace.GetNamespaceMembers();
             foreach (var namespaceSymbol in namespaces)
             {
-                if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => namespaceSymbol.Name.StartsWith(n)))
+                if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => namespaceSymbol.Name.StartsWith(n, StringComparison.OrdinalIgnoreCase)))
                 {
                     ParseNamespace(data, namespaceSymbol, null);
                 }

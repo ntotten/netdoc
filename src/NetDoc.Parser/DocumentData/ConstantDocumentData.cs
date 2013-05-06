@@ -1,6 +1,6 @@
-﻿namespace NetDoc.Parser.DocumentData
+﻿namespace NetDoc.Parser.Model
 {
-    public class ConstantDocumentData : IdentificableDocumentDataObject
+    public class ConstantDocumentData : DocumentDataObjectWithId
     {
         public string Value { get; set; }
 

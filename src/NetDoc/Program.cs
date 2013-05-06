@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using NetDoc.Parser;
 
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -15,6 +15,8 @@
             var task = netDoc.Invoke(input);
             task.Wait();
             var results = task.Result;
+
+            System.Console.WriteLine(results.ToString());            
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace NetDoc.Parser.DocumentData
+﻿namespace NetDoc.Parser.Model
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -17,8 +17,11 @@
 
         public void AddNamedType(NamedTypeDocumentData data)
         {
-            data.GenerateId();
-            this.namedTypes.Add(data);
+            if (data != null)
+            {
+                data.GenerateId();
+                this.namedTypes.Add(data);
+            }
         }
     }
 }

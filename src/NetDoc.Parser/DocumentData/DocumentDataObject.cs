@@ -1,4 +1,4 @@
-﻿namespace NetDoc.Parser.DocumentData
+﻿namespace NetDoc.Parser.Model
 {
     public class DocumentDataObject
     {
