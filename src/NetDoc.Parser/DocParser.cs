@@ -7,29 +7,40 @@
     using Roslyn.Compilers;
     using Roslyn.Compilers.Common;
 
-    public static class DocParser
+    public class DocParser
     {
-        public static DocumentData Parse(string projectPath)
+        public DocParser()
+        {
+            this.Data = new DocumentData();
+        }
+
+        public DocumentData Data { get; set; }
+
+        public void Parse(IDictionary<string, string>[] projects, IEnumerable<string> namespacesBegins)
+        {
+            foreach (var project in projects)
+            {
+                var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(project["path"]);
+                var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
+
+                this.Parse(compilation, namespacesBegins);
+            }
+        }
+
+        public void Parse(string projectPath, IEnumerable<string> namespacesBegins)
         {
             var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(projectPath);
             var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
 
-            var namespacesBegins = new string[] 
-            {
-                "Facebook"
-            }.AsEnumerable();
-
-            return Parse(compilation, namespacesBegins);
+            this.Parse(compilation, namespacesBegins);
         }
 
-        public static DocumentData Parse(CommonCompilation compilation, IEnumerable<string> namespacesBegins)
+        public void Parse(CommonCompilation compilation, IEnumerable<string> namespacesBegins)
         {
             if (compilation == null)
             {
                 throw new ArgumentNullException("compilation");
             }
-
-            var data = new DocumentData();
 
             var globalNamespace = compilation.GlobalNamespace;
             var namespaces = globalNamespace.GetNamespaceMembers();
@@ -37,11 +48,9 @@
             {
                 if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => namespaceSymbol.Name.StartsWith(n, StringComparison.OrdinalIgnoreCase)))
                 {
-                    ParseNamespace(data, namespaceSymbol, null);
+                    ParseNamespace(this.Data, namespaceSymbol, null);
                 }
             }
-
-            return data;
         }
 
         private static T CreateDocumentData<T>(ISymbol symbol, string rootName) where T : DocumentDataObject, new()
@@ -55,14 +64,7 @@
                 data.DisplayName = data.DisplayName.Replace(rootName, string.Empty).Substring(1);
             }
 
-            if (string.IsNullOrEmpty(rootName))
-            {
-                data.FullName = data.Name;
-            }
-            else
-            {
-                data.FullName = rootName + "." + data.Name;
-            }
+            data.FullName = string.IsNullOrEmpty(rootName) ? data.Name : rootName + "." + data.Name;
 
             DocumentationComment comment = null;
             try
@@ -84,8 +86,12 @@
 
         private static void ParseNamespace(DocumentData parent, INamespaceSymbol symbol, string rootName)
         {
-            var data = CreateDocumentData<NamespaceDocumentData>(symbol, rootName);
-            parent.AddNamespace(data);
+            var data = parent.GetNamespace(symbol);
+            if (data == null)
+            {
+                data = CreateDocumentData<NamespaceDocumentData>(symbol, rootName);
+                parent.AddNamespace(data);
+            }
 
             // Namespaces
             var namespaces = symbol.GetNamespaceMembers();

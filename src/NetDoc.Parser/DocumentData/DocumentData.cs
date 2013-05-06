@@ -1,6 +1,8 @@
 ﻿namespace NetDoc.Parser.Model
 {
     using System.Collections.Generic;
+    using System.Linq;
+    using Roslyn.Compilers.Common;
 
     public class DocumentData
     {
@@ -21,6 +23,12 @@
                 var key = data.Name ?? string.Empty;
                 this.namespaces.Add(key, data);
             }
+        }
+
+        internal NamespaceDocumentData GetNamespace(INamespaceSymbol symbol)
+        {
+            var name = symbol.Name ?? string.Empty;
+            return this.namespaces.ContainsKey(name) ? this.namespaces[name] : null;
         }
     }
 }
