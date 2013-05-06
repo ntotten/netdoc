@@ -2,5 +2,5 @@ if locals.events && events.length > 0
   div.referenceTitle events
   each item in events
     div.itemDetails(id=item.id)
-      div.itemDetailsTitle=item.name
+      div.itemDetailsTitle= item.accessModifier + " " + item.name
       div.itemDetailsDescription!=item.summary

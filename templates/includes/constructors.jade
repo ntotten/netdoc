@@ -2,7 +2,7 @@ if locals.constructors && constructors.length > 0
   div.referenceTitle Constructors
   each item in constructors
     div.itemDetails(id=item.id)
-      div.itemDetailsTitle=item.name
+      div.itemDetailsTitle= item.accessModifier + " " + item.name
         if (item.typeArguments.length > 0)
           span &lt;
           each arg, i in item.typeArguments
@@ -15,7 +15,7 @@ if locals.constructors && constructors.length > 0
           each param, i in item.parameters
             if i > 0
               span , 
-            span=param.type.displayName
+            span=param.type.displayName + " " + param.name
         span )
       div.itemDetailsDescription!=item.summary
         if (item.parameters.length > 0)

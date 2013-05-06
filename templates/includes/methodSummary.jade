@@ -5,10 +5,10 @@ if locals.methods && methods.length > 0
     each item in methods
       tr
         td
-          span
-           item.type= item.returnType.displayName
+          span= item.returnType.displayName
         td
           span.itemName
+            span.modifier= item.accessModifier + " "
             a(href="#"+item.id)=item.name
             if (item.typeArguments.length > 0)
               span &lt;

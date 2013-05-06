@@ -6,5 +6,6 @@ if locals.events && events.length > 0
       tr
         td
           span.itemName
+            span.modifier= item.accessModifier + " "
             a(href="#"+item.id)=item.name
           div.itemSummary!=item.summary

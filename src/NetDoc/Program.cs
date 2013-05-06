@@ -22,7 +22,7 @@
             task.Wait();
             var results = task.Result;
 
-            System.Console.WriteLine(results.ToString());            
+            System.Console.WriteLine(results.ToString());
         }
     }
 }

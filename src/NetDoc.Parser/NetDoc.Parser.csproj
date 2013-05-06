@@ -78,6 +78,7 @@
     <Compile Include="DocumentData\NamedTypeDocumentData.cs" />
     <Compile Include="DocumentData\NamespaceDocumentData.cs" />
     <Compile Include="DocumentData\PropertyDocumentData.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

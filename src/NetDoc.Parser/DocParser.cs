@@ -1,4 +1,4 @@
-﻿namespace NetDoc
+﻿namespace NetDoc.Parser
 {
     using System;
     using System.Collections.Generic;
@@ -64,6 +64,7 @@
                 data.DisplayName = data.DisplayName.Replace(rootName, string.Empty).Substring(1);
             }
 
+            data.AccessModifier = Helper.RetrieveAccessModifier(symbol.DeclaredAccessibility);
             data.FullName = string.IsNullOrEmpty(rootName) ? data.Name : rootName + "." + data.Name;
 
             DocumentationComment comment = null;

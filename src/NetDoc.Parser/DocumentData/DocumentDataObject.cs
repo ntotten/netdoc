@@ -11,5 +11,7 @@
         public string Summary { get; set; }
 
         public string ReturnDescription { get; set; }
+
+        public string AccessModifier { get; set; }
     }
 }

@@ -6,6 +6,7 @@ if locals.constructors && constructors.length > 0
       tr
         td
           span.itemName
+            span.modifier= item.accessModifier + " "
             a(href="#"+item.id)=item.name
             if (item.typeArguments.length > 0)
               span &lt;

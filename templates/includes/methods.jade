@@ -4,7 +4,7 @@ if methods.length > 0
     div.itemDetails(id=item.id)
       div.itemDetailsTitle
         if (item.returnType)
-          span=item.returnType.name + " "
+          span= item.accessModifier + " " + item.returnType.displayName + " "
         span=item.name
         if (item.typeArguments.length > 0)
           span &lt;
@@ -18,7 +18,7 @@ if methods.length > 0
           each param, i in item.parameters
             if i > 0
               span , 
-            span=param.type.displayName
+            span=param.type.displayName + " " + param.name
         span )
       div.itemDetailsDescription!=item.summary
         if (item.parameters.length > 0)

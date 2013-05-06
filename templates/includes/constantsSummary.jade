@@ -9,5 +9,6 @@ if locals.constants && constants.length > 0
            item.type
         td
           span.itemName
+           span.modifier= item.accessModifier + " "
            a(href="#"+item.id)=item.name
           div.itemSummary!=item.summary
