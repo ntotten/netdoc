@@ -21,7 +21,7 @@ To install use npm.
     netdoc json <inputPath> <outputPath> 
 
     example:
-    netdoc .\Source\MyProject.csproj .\docs\data.json
+    netdoc json .\Source\MyProject.csproj .\docs\data.json
 
 
     // Generates docs from a json file
@@ -29,3 +29,17 @@ To install use npm.
 
     example:
     netdoc gen .\docs\data.json .\docs\ 
+
+
+    // Generates docs from a config file
+    netdoc fromConfig <inputPath> <outputPath>
+
+    example:
+    netdoc fromConfig config.json .\docs\
+
+
+    // Create a json document use to generate the docs from a config file
+    netdoc jsonFromConfig <inputPath> <outputPath> 
+
+    example:
+    netdoc jsonFromConfig config.json .\docs\data.json
