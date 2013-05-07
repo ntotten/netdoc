@@ -111,7 +111,7 @@
 
         private static void ParseTypeMember(NamespaceDocumentData parent, INamedTypeSymbol symbol, string rootName)
         {
-            if (symbol.DeclaredAccessibility == CommonAccessibility.Private)
+            if (IsNotVisibleInGeneratedDocumentation(symbol))
             {
                 return;
             }
@@ -147,7 +147,7 @@
 
         private static void ParseEvent(NamedTypeDocumentData parent, IEventSymbol symbol, string rootName)
         {
-            if (symbol.DeclaredAccessibility == CommonAccessibility.Private)
+            if (IsNotVisibleInGeneratedDocumentation(symbol))
             {
                 return;
             }
@@ -158,13 +158,14 @@
 
         private static void ParseField(NamedTypeDocumentData parent, IFieldSymbol symbol, string rootName)
         {
-            if (symbol.DeclaredAccessibility == CommonAccessibility.Private || !symbol.IsConst)
+            if (IsNotVisibleInGeneratedDocumentation(symbol) || !symbol.IsConst)
             {
                 return;
             }
 
             var data = CreateDocumentData<ConstantDocumentData>(symbol, rootName);
             data.Value = symbol.ConstantValue.ToString();
+            data.MemberType = CreateDocumentData<DocumentDataObject>(symbol.Type, null);
             parent.AddConstant(data);
         }
 
@@ -177,7 +178,7 @@
                 return;
             }
 
-            if (symbol.DeclaredAccessibility == CommonAccessibility.Private)
+            if (IsNotVisibleInGeneratedDocumentation(symbol))
             {
                 return;
             }
@@ -213,7 +214,7 @@
 
         private static void ParseProperty(NamedTypeDocumentData parent, IPropertySymbol symbol, string rootName)
         {
-            if (symbol.DeclaredAccessibility == CommonAccessibility.Private)
+            if (IsNotVisibleInGeneratedDocumentation(symbol))
             {
                 return;
             }
@@ -221,6 +222,14 @@
             var data = CreateDocumentData<PropertyDocumentData>(symbol, rootName);
             data.Type = CreateDocumentData<DocumentDataObject>(symbol.Type, null);
             parent.AddProperty(data);
+        }
+
+        private static bool IsNotVisibleInGeneratedDocumentation(ISymbol symbol)
+        {
+            return symbol.DeclaredAccessibility == CommonAccessibility.Private ||
+                symbol.DeclaredAccessibility == CommonAccessibility.Internal ||
+                symbol.DeclaredAccessibility == CommonAccessibility.ProtectedAndInternal ||
+                symbol.DeclaredAccessibility == CommonAccessibility.ProtectedOrInternal;
         }
     }
 }

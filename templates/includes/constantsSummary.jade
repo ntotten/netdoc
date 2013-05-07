@@ -6,7 +6,7 @@ if locals.constants && constants.length > 0
       tr
         td
           span
-           item.type
+           item.type= item.memberType.displayName
         td
           span.itemName
            span.modifier= item.accessModifier + " "

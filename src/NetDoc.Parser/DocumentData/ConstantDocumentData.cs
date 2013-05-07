@@ -4,6 +4,8 @@
     {
         public string Value { get; set; }
 
+        public DocumentDataObject MemberType { get; set; }
+
         public override void GenerateId()
         {
             this.Id = this.Name;

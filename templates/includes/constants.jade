@@ -2,5 +2,6 @@ if locals.constants && constants.length > 0
   div.referenceTitle Constants
   each item in constants
     div.itemDetails(id=item.id)
-      div.itemDetailsTitle= item.accessModifier + " " + item.name
+      div.itemDetailsTitle= item.accessModifier + " " + item.memberType.displayName + " " + item.name
       div.itemDetailsDescription!=item.summary
+      div.itemDetailsValue="Value: " + item.value
