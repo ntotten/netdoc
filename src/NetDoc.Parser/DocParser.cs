@@ -185,10 +185,20 @@
 
             var data = CreateDocumentData<MethodDocumentData>(symbol, rootName);
 
+            DocumentationComment comment = null;
+            try
+            {
+                comment = symbol.GetDocumentationComment();
+            }
+            catch
+            {
+            }
+
             var parameters = symbol.Parameters;
             foreach (var parameter in parameters)
             {
                 var parameterData = CreateDocumentData<MethodParameterData>(parameter, null);
+                parameterData.Summary = comment.GetParameterText(parameterData.Name) ?? string.Empty;
                 parameterData.Type = CreateDocumentData<DocumentDataObject>(parameter.Type, null);
                 data.Parameters.Add(parameterData);
             }
