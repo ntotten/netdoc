@@ -117,6 +117,7 @@
             }
 
             var data = CreateDocumentData<NamedTypeDocumentData>(symbol, rootName);
+            data.TypeKind = symbol.TypeKind.ToString();
             parent.AddNamedType(data);
 
             // Process Members

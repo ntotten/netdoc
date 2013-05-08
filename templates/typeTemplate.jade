@@ -2,19 +2,25 @@ extends sidebarLayout
 
 block contentBody
   .header
-    h1= name + " Class"
+    h1= name + " " + typeKind
   #doc
     include includes/classHeader
     include includes/overview
     div.referenceTitle Summary
     div.summarySection
-      include includes/constantsSummary
-      include includes/constructorsSummary
-      include includes/propertiesSummary
-      include includes/eventsSummary
-      include includes/methodSummary
-    include includes/constants
-    include includes/constructors
-    include includes/properties
-    include includes/events
-    include includes/methods
+      if (typeKind.toLowerCase() == "enum")
+        include includes/enumValuesSummary
+      else
+        include includes/constantsSummary
+        include includes/constructorsSummary
+        include includes/propertiesSummary
+        include includes/eventsSummary
+        include includes/methodSummary
+    if (typeKind.toLowerCase() == "enum")
+      include includes/enumValues
+    else
+      include includes/constants
+      include includes/constructors
+      include includes/properties
+      include includes/events
+      include includes/methods

@@ -1,6 +1,6 @@
 div.typeHeader
   div.namespace="namespace " + fullName.substr(0,fullName.lastIndexOf('.'))
-  span.modifiers=accessModifier
+  span.modifiers=accessModifier + " " + typeKind.toLowerCase() 
   span.typeName=name
   if (locals.father)
     span.father=father

@@ -1,0 +1,13 @@
+if locals.constants && constants.length > 0
+  table
+    tr
+      th(colspan='2') Values
+    each item in constants
+      tr
+        td
+          span
+           item.type= item.value
+        td
+          span.itemName
+            a(href="#"+item.id)=item.name
+          div.itemSummary!=item.summary

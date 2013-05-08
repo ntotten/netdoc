@@ -51,6 +51,8 @@
             }
         }
 
+        public string TypeKind { get; set; }
+
         public void AddConstant(ConstantDocumentData data)
         {
             if (data != null)

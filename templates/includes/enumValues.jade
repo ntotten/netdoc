@@ -1,0 +1,7 @@
+if locals.constants && constants.length > 0
+  div.referenceTitle Values
+  each item in constants
+    div.itemDetails(id=item.id)
+      div.itemDetailsTitle= item.name
+      div.itemDetailsDescription!=item.summary
+      div.itemDetailsValue="Value: " + item.value
