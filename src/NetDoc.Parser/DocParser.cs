@@ -20,11 +20,13 @@
         {
             foreach (var project in projects)
             {
-                var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(project["path"]);
-                var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
-
-                this.Parse(compilation, namespacesBegins, project["id"]);
+                this.Parse(project["path"], namespacesBegins, project["id"]);
             }
+        }
+
+        public void Parse(string projectPath, IEnumerable<string> namespacesBegins)
+        {
+            this.Parse(projectPath, namespacesBegins, string.Empty);
         }
 
         public void Parse(string projectPath, IEnumerable<string> namespacesBegins, string id)
@@ -33,14 +35,6 @@
             var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
 
             this.Parse(compilation, namespacesBegins, id);
-        }
-
-        public void Parse(string projectPath, IEnumerable<string> namespacesBegins)
-        {
-            var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(projectPath);
-            var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
-
-            this.Parse(compilation, namespacesBegins, string.Empty);
         }
 
         public void Parse(CommonCompilation compilation, IEnumerable<string> namespacesBegins, string id)
