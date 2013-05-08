@@ -4,3 +4,4 @@ if locals.properties && properties.length > 0
     div.itemDetails(id=item.id)
       div.itemDetailsTitle= item.accessModifier + " " + item.name
       div.itemDetailsDescription!=item.summary
+        include supportedProjects

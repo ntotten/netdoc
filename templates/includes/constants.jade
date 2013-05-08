@@ -4,4 +4,5 @@ if locals.constants && constants.length > 0
     div.itemDetails(id=item.id)
       div.itemDetailsTitle= item.accessModifier + " " + item.memberType.displayName + " " + item.name
       div.itemDetailsDescription!=item.summary
-      div.itemDetailsValue="Value: " + item.value
+        include supportedProjects
+        div.itemDetailsValue="Value: " + item.value

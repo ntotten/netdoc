@@ -5,13 +5,13 @@
 
     public class NamespaceDocumentData : DocumentDataObject
     {
-        private List<NamedTypeDocumentData> namedTypes = new List<NamedTypeDocumentData>();
+        private SortedList<string, NamedTypeDocumentData> namedTypes = new SortedList<string, NamedTypeDocumentData>();
 
         public IEnumerable<NamedTypeDocumentData> NamedTypes
         {
             get
             {
-                return this.namedTypes.OrderBy(m => m.Name).ToArray();
+                return this.namedTypes.Values.ToArray();
             }
         }
 
@@ -20,8 +20,13 @@
             if (data != null)
             {
                 data.GenerateId();
-                this.namedTypes.Add(data);
+                this.namedTypes.Add(data.Id, data);
             }
+        }
+
+        internal NamedTypeDocumentData GetTypeMember(string fullName)
+        {
+            return this.namedTypes.ContainsKey(fullName) ? this.namedTypes[fullName] : null;
         }
     }
 }

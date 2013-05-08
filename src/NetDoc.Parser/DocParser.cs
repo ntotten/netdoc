@@ -23,8 +23,16 @@
                 var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(project["path"]);
                 var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
 
-                this.Parse(compilation, namespacesBegins);
+                this.Parse(compilation, namespacesBegins, project["id"]);
             }
+        }
+
+        public void Parse(string projectPath, IEnumerable<string> namespacesBegins, string id)
+        {
+            var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(projectPath);
+            var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
+
+            this.Parse(compilation, namespacesBegins, id);
         }
 
         public void Parse(string projectPath, IEnumerable<string> namespacesBegins)
@@ -32,10 +40,10 @@
             var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(projectPath);
             var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
 
-            this.Parse(compilation, namespacesBegins);
+            this.Parse(compilation, namespacesBegins, string.Empty);
         }
 
-        public void Parse(CommonCompilation compilation, IEnumerable<string> namespacesBegins)
+        public void Parse(CommonCompilation compilation, IEnumerable<string> namespacesBegins, string id)
         {
             if (compilation == null)
             {
@@ -48,16 +56,17 @@
             {
                 if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => namespaceSymbol.Name.StartsWith(n, StringComparison.OrdinalIgnoreCase)))
                 {
-                    ParseNamespace(this.Data, namespaceSymbol, null);
+                    ParseNamespace(this.Data, namespaceSymbol, null, id);
                 }
             }
         }
 
-        private static T CreateDocumentData<T>(ISymbol symbol, string rootName) where T : DocumentDataObject, new()
+        private static T CreateDocumentData<T>(ISymbol symbol, string rootName, string id) where T : DocumentDataObject, new()
         {
             var data = new T();
             data.Name = symbol.Name;
             data.DisplayName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+            data.SupportedProjects.Add(id);
 
             if (rootName != null)
             {
@@ -65,7 +74,7 @@
             }
 
             data.AccessModifier = Helper.RetrieveAccessModifier(symbol.DeclaredAccessibility);
-            data.FullName = string.IsNullOrEmpty(rootName) ? data.Name : rootName + "." + data.Name;
+            data.FullName = GetFullName(symbol, rootName);
 
             DocumentationComment comment = null;
             try
@@ -85,40 +94,58 @@
             return data;
         }
 
-        private static void ParseNamespace(DocumentData parent, INamespaceSymbol symbol, string rootName)
+        private static string GetFullName(ISymbol symbol, string rootName)
+        {
+            return string.IsNullOrEmpty(rootName) ? symbol.Name : rootName + "." + symbol.Name;
+        }
+
+        private static void ParseNamespace(DocumentData parent, INamespaceSymbol symbol, string rootName, string id)
         {
             var data = parent.GetNamespace(symbol);
             if (data == null)
             {
-                data = CreateDocumentData<NamespaceDocumentData>(symbol, rootName);
+                data = CreateDocumentData<NamespaceDocumentData>(symbol, rootName, id);
                 parent.AddNamespace(data);
+            }
+            else
+            {
+                data.SupportedProjects.Add(id);
             }
 
             // Namespaces
             var namespaces = symbol.GetNamespaceMembers();
             foreach (var namespaceSymbol in namespaces)
             {
-                ParseNamespace(parent, namespaceSymbol, rootName: data.Name);
+                ParseNamespace(parent, namespaceSymbol, data.Name, id);
             }
 
             // Types
             var typeMembers = symbol.GetTypeMembers();
             foreach (var typeMember in typeMembers)
             {
-                ParseTypeMember(data, typeMember, data.FullName);
+                ParseTypeMember(data, typeMember, data.FullName, id);
             }
         }
 
-        private static void ParseTypeMember(NamespaceDocumentData parent, INamedTypeSymbol symbol, string rootName)
+        private static void ParseTypeMember(NamespaceDocumentData parent, INamedTypeSymbol symbol, string rootName, string id)
         {
             if (IsNotVisibleInGeneratedDocumentation(symbol))
             {
                 return;
             }
 
-            var data = CreateDocumentData<NamedTypeDocumentData>(symbol, rootName);
+            var data = parent.GetTypeMember(GetFullName(symbol, rootName));
+            if (data == null)
+            {
+                data = CreateDocumentData<NamedTypeDocumentData>(symbol, rootName, id);
+                parent.AddNamedType(data);
+            }
+            else
+            {
+                data.SupportedProjects.Add(id);
+            }
+
             data.TypeKind = symbol.TypeKind.ToString();
-            parent.AddNamedType(data);
 
             // Process Members
             var members = symbol.GetMembers();
@@ -128,49 +155,65 @@
                 {
                     case CommonSymbolKind.Field:
 
-                        ParseField(data, (IFieldSymbol)member, data.FullName);
+                        ParseField(data, (IFieldSymbol)member, data.FullName, id);
                         break;
                     case CommonSymbolKind.Event:
 
-                        ParseEvent(data, (IEventSymbol)member, data.FullName);
+                        ParseEvent(data, (IEventSymbol)member, data.FullName, id);
                         break;
                     case CommonSymbolKind.Method:
 
-                        ParseMethod(data, (IMethodSymbol)member, data.FullName);
+                        ParseMethod(data, (IMethodSymbol)member, data.FullName, id);
                         break;
                     case CommonSymbolKind.Property:
 
-                        ParseProperty(data, (IPropertySymbol)member, data.FullName);
+                        ParseProperty(data, (IPropertySymbol)member, data.FullName, id);
                         break;
                 }
             }
         }
 
-        private static void ParseEvent(NamedTypeDocumentData parent, IEventSymbol symbol, string rootName)
+        private static void ParseEvent(NamedTypeDocumentData parent, IEventSymbol symbol, string rootName, string id)
         {
             if (IsNotVisibleInGeneratedDocumentation(symbol))
             {
                 return;
             }
 
-            var data = CreateDocumentData<EventDocumentData>(symbol, rootName);
-            parent.AddEvent(data);
+            var data = parent.GetEvent(symbol.Name);
+            if (data == null)
+            {
+                data = CreateDocumentData<EventDocumentData>(symbol, rootName, id);
+                parent.AddEvent(data);
+            }
+            else
+            {
+                data.SupportedProjects.Add(id);
+            }
         }
 
-        private static void ParseField(NamedTypeDocumentData parent, IFieldSymbol symbol, string rootName)
+        private static void ParseField(NamedTypeDocumentData parent, IFieldSymbol symbol, string rootName, string id)
         {
             if (IsNotVisibleInGeneratedDocumentation(symbol) || !symbol.IsConst)
             {
                 return;
             }
 
-            var data = CreateDocumentData<ConstantDocumentData>(symbol, rootName);
-            data.Value = symbol.ConstantValue.ToString();
-            data.MemberType = CreateDocumentData<DocumentDataObject>(symbol.Type, null);
-            parent.AddConstant(data);
+            var data = parent.GetConstant(symbol.Name);
+            if (data == null)
+            {
+                data = CreateDocumentData<ConstantDocumentData>(symbol, rootName, id);
+                data.Value = symbol.ConstantValue.ToString();
+                data.MemberType = CreateDocumentData<DocumentDataObject>(symbol.Type, null, string.Empty);
+                parent.AddConstant(data);
+            }
+            else
+            {
+                data.SupportedProjects.Add(id);
+            }
         }
 
-        private static void ParseMethod(NamedTypeDocumentData parent, IMethodSymbol symbol, string rootName)
+        private static void ParseMethod(NamedTypeDocumentData parent, IMethodSymbol symbol, string rootName, string id)
         {
             if (symbol.AssociatedPropertyOrEvent != null)
             {
@@ -184,7 +227,7 @@
                 return;
             }
 
-            var data = CreateDocumentData<MethodDocumentData>(symbol, rootName);
+            var data = CreateDocumentData<MethodDocumentData>(symbol, rootName, id);
 
             DocumentationComment comment = null;
             try
@@ -198,41 +241,66 @@
             var parameters = symbol.Parameters;
             foreach (var parameter in parameters)
             {
-                var parameterData = CreateDocumentData<MethodParameterData>(parameter, null);
+                var parameterData = CreateDocumentData<MethodParameterData>(parameter, null, string.Empty);
                 parameterData.Summary = comment.GetParameterText(parameterData.Name) ?? string.Empty;
-                parameterData.Type = CreateDocumentData<DocumentDataObject>(parameter.Type, null);
+                parameterData.Type = CreateDocumentData<DocumentDataObject>(parameter.Type, null, string.Empty);
                 data.Parameters.Add(parameterData);
             }
 
             var typeArguments = symbol.TypeArguments;
             foreach (var typeArgument in typeArguments)
             {
-                var typeArgumentData = CreateDocumentData<MethodTypeArgumentData>(typeArgument, null);
+                var typeArgumentData = CreateDocumentData<MethodTypeArgumentData>(typeArgument, null, string.Empty);
                 data.TypeArguments.Add(typeArgumentData);
             }
 
+            data.GenerateId();
             if (symbol.MethodKind == CommonMethodKind.Constructor || symbol.MethodKind == CommonMethodKind.StaticConstructor)
             {
-                data.ReturnType = null;
-                parent.AddConstructor(data);
+                var existingConstructor = parent.GetConstructor(data.Id);
+                if (existingConstructor == null)
+                {
+                    data.ReturnType = null;
+                    parent.AddConstructor(data);
+                }
+                else
+                {
+                    existingConstructor.SupportedProjects.Add(id);
+                }
             }
             else
             {
-                data.ReturnType = CreateDocumentData<DocumentDataObject>(symbol.ReturnType, null);
-                parent.AddMethod(data);
+                var existingMethod = parent.GetMethod(data.Id);
+                if (existingMethod == null)
+                {
+                    data.ReturnType = CreateDocumentData<DocumentDataObject>(symbol.ReturnType, null, string.Empty);
+                    parent.AddMethod(data);
+                }
+                else
+                {
+                    existingMethod.SupportedProjects.Add(id);
+                }
             }
         }
 
-        private static void ParseProperty(NamedTypeDocumentData parent, IPropertySymbol symbol, string rootName)
+        private static void ParseProperty(NamedTypeDocumentData parent, IPropertySymbol symbol, string rootName, string id)
         {
             if (IsNotVisibleInGeneratedDocumentation(symbol))
             {
                 return;
             }
 
-            var data = CreateDocumentData<PropertyDocumentData>(symbol, rootName);
-            data.Type = CreateDocumentData<DocumentDataObject>(symbol.Type, null);
-            parent.AddProperty(data);
+            var data = parent.GetProperty(symbol.Name);
+            if (data == null)
+            {
+                data = CreateDocumentData<PropertyDocumentData>(symbol, rootName, id);
+                data.Type = CreateDocumentData<DocumentDataObject>(symbol.Type, null, string.Empty);
+                parent.AddProperty(data);
+            }
+            else
+            {
+                data.SupportedProjects.Add(id);
+            }
         }
 
         private static bool IsNotVisibleInGeneratedDocumentation(ISymbol symbol)

@@ -5,17 +5,17 @@
 
     public class NamedTypeDocumentData : DocumentDataObjectWithId
     {
-        private List<ConstantDocumentData> constants = new List<ConstantDocumentData>();
-        private List<MethodDocumentData> constructors = new List<MethodDocumentData>();
-        private List<PropertyDocumentData> properties = new List<PropertyDocumentData>();
-        private List<MethodDocumentData> methods = new List<MethodDocumentData>();
-        private List<EventDocumentData> events = new List<EventDocumentData>();
+        private IDictionary<string, ConstantDocumentData> constants = new SortedList<string, ConstantDocumentData>();
+        private IDictionary<string, MethodDocumentData> constructors = new SortedList<string, MethodDocumentData>();
+        private IDictionary<string, PropertyDocumentData> properties = new SortedList<string, PropertyDocumentData>();
+        private IDictionary<string, MethodDocumentData> methods = new SortedList<string, MethodDocumentData>();
+        private IDictionary<string, EventDocumentData> events = new SortedList<string, EventDocumentData>();
 
         public IEnumerable<ConstantDocumentData> Constants
         {
             get
             {
-                return this.constants.OrderBy(m => m.Name).ToArray();
+                return this.constants.Values.ToArray();
             }
         }
 
@@ -23,7 +23,7 @@
         {
             get
             {
-                return this.constructors.OrderBy(m => m.Name).ToArray();
+                return this.constructors.Values.ToArray();
             }
         }
 
@@ -31,7 +31,7 @@
         {
             get
             {
-                return this.properties.OrderBy(m => m.Name).ToArray();
+                return this.properties.Values.ToArray();
             }
         }
 
@@ -39,7 +39,7 @@
         {
             get
             {
-                return this.methods.OrderBy(m => m.Name).ToArray();
+                return this.methods.Values.ToArray();
             }
         }
 
@@ -47,7 +47,7 @@
         {
             get
             {
-                return this.events.OrderBy(m => m.Name).ToArray();
+                return this.events.Values.ToArray();
             }
         }
 
@@ -57,8 +57,12 @@
         {
             if (data != null)
             {
-                data.GenerateId();
-                this.constants.Add(data);
+                if (data.Id == null)
+                {
+                    data.GenerateId();
+                }
+
+                this.constants.Add(data.Id, data);
             }
         }
 
@@ -66,8 +70,12 @@
         {
             if (data != null)
             {
-                data.GenerateId();
-                this.constructors.Add(data);
+                if (data.Id == null)
+                {
+                    data.GenerateId();
+                }
+
+                this.constructors.Add(data.Id, data);
             }
         }
 
@@ -75,8 +83,12 @@
         {
             if (data != null)
             {
-                data.GenerateId();
-                this.properties.Add(data);
+                if (data.Id == null)
+                {
+                    data.GenerateId();
+                }
+
+                this.properties.Add(data.Id, data);
             }
         }
 
@@ -84,8 +96,12 @@
         {
             if (data != null)
             {
-                data.GenerateId();
-                this.methods.Add(data);
+                if (data.Id == null)
+                {
+                    data.GenerateId();
+                }
+
+                this.methods.Add(data.Id, data);
             }
         }
 
@@ -93,14 +109,43 @@
         {
             if (data != null)
             {
-                data.GenerateId();
-                this.events.Add(data);
+                if (data.Id == null)
+                {
+                    data.GenerateId();
+                }
+
+                this.events.Add(data.Id, data);
             }
         }
 
         public override void GenerateId()
         {
             this.Id = this.FullName;
+        }
+
+        internal EventDocumentData GetEvent(string id)
+        {
+            return id != null && this.events.ContainsKey(id) ? this.events[id] : null;
+        }
+
+        internal ConstantDocumentData GetConstant(string id)
+        {
+            return id != null && this.constants.ContainsKey(id) ? this.constants[id] : null;
+        }
+
+        internal MethodDocumentData GetConstructor(string id)
+        {
+            return id != null && this.constructors.ContainsKey(id) ? this.constructors[id] : null;
+        }
+
+        internal MethodDocumentData GetMethod(string id)
+        {
+            return id != null && this.methods.ContainsKey(id) ? this.methods[id] : null;
+        }
+
+        internal PropertyDocumentData GetProperty(string id)
+        {
+            return id != null && this.properties.ContainsKey(id) ? this.properties[id] : null;
         }
     }
 }
