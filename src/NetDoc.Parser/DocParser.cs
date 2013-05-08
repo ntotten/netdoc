@@ -66,7 +66,11 @@
             var data = new T();
             data.Name = symbol.Name;
             data.DisplayName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-            data.SupportedProjects.Add(id);
+
+            if (!string.IsNullOrEmpty(id))
+            {
+                data.SupportedProjects.Add(id);
+            }
 
             if (rootName != null)
             {
