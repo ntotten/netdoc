@@ -20,7 +20,7 @@
         {
             foreach (var project in projects)
             {
-                this.Parse(project["path"], namespacesBegins, project["id"]);
+                this.Parse(project["path"], namespacesBegins, project.ContainsKey("id") ? project["id"] : string.Empty);
             }
         }
 
