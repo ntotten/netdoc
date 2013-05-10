@@ -1,28 +1,33 @@
 ﻿namespace NetDoc
 {
-    using System.Collections.Generic;
+    using System.IO;
     using NetDoc.Parser;
+    using Newtonsoft.Json;
 
     public static class Program
     {
         public static void Main(string[] args)
         {
-            var input = new Dictionary<string, object>();
+            var configurationFile = args[0];
+            var config = LoadConfiguration(configurationFile);
 
-            var project = new Dictionary<string, object>();
-            ////project.Add("path", "F:\\r\\facebooksdk\\forks\\facebook-csharp-sdk\\Source\\Facebook\\Facebook-Net45.csproj");
-            project.Add("path", "F:\\r\\facebooksdk\\forks\\facebook-winclient-sdk\\Source\\Facebook.Client-WindowsStore\\Facebook.Client-WindowsStore.csproj");
-
-            var projects = new Dictionary<string, object>[] { project };
-
-            input.Add("projects", projects);
-
-            var netDoc = new Startup();
-            var task = netDoc.Invoke(input);
+            var task = Startup.ParseProjects(config);
             task.Wait();
-            var results = task.Result;
 
-            System.Console.WriteLine(results.ToString());
+            System.Console.WriteLine(task.Result);
+        }
+
+        private static Configuration LoadConfiguration(string configurationFile)
+        {
+            Configuration config = default(Configuration);
+
+            using (var reader = File.OpenText(configurationFile))
+            {
+                var jsonText = reader.ReadToEnd();
+                config = JsonConvert.DeserializeObject<Configuration>(jsonText);
+            }
+
+            return config;
         }
     }
 }

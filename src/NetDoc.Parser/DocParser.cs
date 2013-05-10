@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using NetDoc.Parser.Model;
     using Roslyn.Compilers;
@@ -16,11 +17,11 @@
 
         public DocumentData Data { get; set; }
 
-        public void Parse(IDictionary<string, string>[] projects, IEnumerable<string> namespacesBegins)
+        public void Parse(Configuration config)
         {
-            foreach (var project in projects)
+            foreach (var project in config.Projects)
             {
-                this.Parse(project["path"], namespacesBegins, project.ContainsKey("id") ? project["id"] : string.Empty);
+                this.Parse(project.Path, config.FilteredNamespaces, !string.IsNullOrEmpty(project.Id) ? project.Id : string.Empty);
             }
         }
 
@@ -31,7 +32,7 @@
 
         public void Parse(string projectPath, IEnumerable<string> namespacesBegins, string id)
         {
-            var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(projectPath);
+            var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(Path.GetFullPath(projectPath));
             var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
 
             this.Parse(compilation, namespacesBegins, id);
@@ -48,9 +49,9 @@
             var namespaces = globalNamespace.GetNamespaceMembers();
             foreach (var namespaceSymbol in namespaces)
             {
-                if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => namespaceSymbol.Name.StartsWith(n, StringComparison.OrdinalIgnoreCase)))
+                if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => ValidNamespace(0, namespaceSymbol, n)))
                 {
-                    ParseNamespace(this.Data, namespaceSymbol, null, id);
+                    ParseNamespace(this.Data, namespaceSymbol, null, namespacesBegins, 1, id);
                 }
             }
         }
@@ -97,7 +98,7 @@
             return string.IsNullOrEmpty(rootName) ? symbol.Name : rootName + "." + symbol.Name;
         }
 
-        private static void ParseNamespace(DocumentData parent, INamespaceSymbol symbol, string rootName, string id)
+        private static void ParseNamespace(DocumentData parent, INamespaceSymbol symbol, string rootName, IEnumerable<string> namespacesBegins, int namespaceIndex, string id)
         {
             var data = parent.GetNamespace(symbol);
             if (data == null)
@@ -114,14 +115,34 @@
             var namespaces = symbol.GetNamespaceMembers();
             foreach (var namespaceSymbol in namespaces)
             {
-                ParseNamespace(parent, namespaceSymbol, data.Name, id);
+                if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => ValidNamespace(namespaceIndex, namespaceSymbol, n)))
+                {
+                    ParseNamespace(parent, namespaceSymbol, data.Name, namespacesBegins, namespaceIndex + 1, id);
+                }
             }
 
-            // Types
-            var typeMembers = symbol.GetTypeMembers();
-            foreach (var typeMember in typeMembers)
+            if (namespacesBegins == null || namespacesBegins.Count() == 0 || namespacesBegins.Any(n => ValidNamespace(namespaceIndex, symbol, n)))
             {
-                ParseTypeMember(data, typeMember, data.FullName, id);
+                // Types
+                var typeMembers = symbol.GetTypeMembers();
+                foreach (var typeMember in typeMembers)
+                {
+                    ParseTypeMember(data, typeMember, data.FullName, id);
+                }
+            }
+        }
+
+        private static bool ValidNamespace(int namespaceIndex, INamespaceSymbol namespaceSymbol, string filterNamespace)
+        {
+            var splittedNamespace = filterNamespace.Split('.');
+
+            if (splittedNamespace.Length > namespaceIndex)
+            {
+                return namespaceSymbol.Name.StartsWith(splittedNamespace[namespaceIndex], StringComparison.OrdinalIgnoreCase);
+            }
+            else
+            {
+                return true;
             }
         }
 

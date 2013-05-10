@@ -7,35 +7,42 @@
 
     public class Startup
     {
+        public static async Task<string> ParseProjects(Configuration config)
+        {
+            var docParser = new DocParser();
+            docParser.Parse(config);
+
+            var settings = new JsonSerializerSettings();
+            settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+            string json = await JsonConvert.SerializeObjectAsync(docParser.Data, Formatting.Indented, settings);
+            return json;
+        }
+
         public async Task<object> Invoke(object input)
         {
             var args = (IDictionary<string, object>)input;
-            var projects = new List<IDictionary<string, string>>();
+
+            var projects = new List<ProjectInfo>();
 
             ((object[])args["projects"]).Cast<IDictionary<string, object>>()
                           .ToList()
                           .ForEach(
                           p =>
                           {
-                              var project = new Dictionary<string, string>();
-                              foreach (var projectInfo in p)
-                                  project.Add(projectInfo.Key, projectInfo.Value.ToString());
-                              
+                              var project = new ProjectInfo();
+                              project.Path = p["path"] as string;
+                              project.Id = p["id"] as string;
+
                               projects.Add(project);
                           });
 
-            var namespacesBegins = new string[] 
+            var config = new Configuration()
             {
-                "Facebook"
-            }.AsEnumerable();
+                Projects = projects,
+                FilteredNamespaces = ((object[])args["filteredNamespaces"]).Cast<string>().ToList()
+            };
 
-            var docParser = new DocParser();
-            docParser.Parse(projects.ToArray(), namespacesBegins);
-
-            var settings = new JsonSerializerSettings();
-            settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
-            string json = await JsonConvert.SerializeObjectAsync(docParser.Data, Formatting.Indented, settings);
-            return json;
+            return await ParseProjects(config);
         }
     }
 }
