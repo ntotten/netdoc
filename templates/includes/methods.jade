@@ -1,0 +1,35 @@
+if methods.length > 0
+  div.referenceTitle Methods
+  each item in methods
+    div.itemDetails(id=item.id)
+      div.itemDetailsTitle
+        if (item.returnType)
+          span= item.accessModifier + " " + item.returnType.displayName + " "
+        span=item.name
+        if (item.typeArguments.length > 0)
+          span &lt;
+          each arg, i in item.typeArguments
+            if i > 0
+              span , 
+            span=arg.name
+          span &gt;
+        span (
+        if (item.parameters.length > 0)
+          each param, i in item.parameters
+            if i > 0
+              span , 
+            span=param.type.displayName + " " + param.name
+        span )
+      div.itemDetailsDescription!=item.summary
+        if (item.parameters.length > 0)
+          div.params
+            span.paramsTitle Parameters
+            each param, i in item.parameters
+              div.paramDesc
+                span.paramName=param.name
+                span.paramSummary=" " + param.summary
+        if (item.returnDescription)
+          div.return
+            span.returnTitle Returns
+            div.returnDesc!=item.returnDescription
+        include supportedProjects

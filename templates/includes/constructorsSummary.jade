@@ -1,0 +1,25 @@
+if locals.constructors && constructors.length > 0
+  table
+    tr
+      th Constructors
+    each item in constructors
+      tr
+        td
+          span.itemName
+            span.modifier= item.accessModifier + " "
+            a(href="#"+item.id)=item.name
+            if (item.typeArguments.length > 0)
+              span &lt;
+              each arg, i in item.typeArguments
+                if i > 0
+                  span , 
+                span=arg.name
+              span &gt;
+            span (
+            if (item.parameters.length > 0)
+              each param, i in item.parameters
+                if i > 0
+                  span , 
+                span=param.type.displayName + " " + param.name
+            span )
+          div.itemSummary!=item.summary

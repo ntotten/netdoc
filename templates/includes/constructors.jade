@@ -1,0 +1,28 @@
+if locals.constructors && constructors.length > 0
+  div.referenceTitle Constructors
+  each item in constructors
+    div.itemDetails(id=item.id)
+      div.itemDetailsTitle= item.accessModifier + " " + item.name
+        if (item.typeArguments.length > 0)
+          span &lt;
+          each arg, i in item.typeArguments
+            if i > 0
+              span , 
+            span=arg.name
+          span &gt;
+        span (
+        if (item.parameters.length > 0)
+          each param, i in item.parameters
+            if i > 0
+              span , 
+            span=param.type.displayName + " " + param.name
+        span )
+      div.itemDetailsDescription!=item.summary
+        if (item.parameters.length > 0)
+          div.params
+            span.paramsTitle Parameters
+            each param, i in item.parameters
+              div.paramDesc
+                span.paramName=param.name
+                param.summary
+        include supportedProjects

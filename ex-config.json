@@ -1,0 +1,11 @@
+{
+  "projects" : [
+    {
+      "path": ".\\src\\NetDoc.Parser\\NetDoc.Parser.csproj",
+      "id": "Windows Phone 8"
+    }
+  ],
+  "filteredNamespaces": [
+    "NetDoc",
+  ]
+}

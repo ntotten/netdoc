@@ -1,15 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NetDoc
+﻿namespace NetDoc
 {
-    class Program
+    using System.IO;
+    using NetDoc.Parser;
+    using Newtonsoft.Json;
+
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            var configurationFile = args[0];
+            var config = LoadConfiguration(configurationFile);
+
+            var task = Startup.ParseProjects(config);
+            task.Wait();
+
+            System.Console.WriteLine(task.Result);
+        }
+
+        private static Configuration LoadConfiguration(string configurationFile)
+        {
+            Configuration config = default(Configuration);
+
+            using (var reader = File.OpenText(configurationFile))
+            {
+                var jsonText = reader.ReadToEnd();
+                config = JsonConvert.DeserializeObject<Configuration>(jsonText);
+            }
+
+            return config;
         }
     }
 }

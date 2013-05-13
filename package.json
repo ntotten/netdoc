@@ -13,8 +13,7 @@
   "license": "MIT License",
   "dependencies": {
     "commander": "~1.1.1",
-    "jade": "~0.29.0",
-    "edge": "~0.7.8"
+    "jade": "~0.29.0"
   },
   "scripts" : { 
     "install" : "tools\\install.bat"

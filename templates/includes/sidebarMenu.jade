@@ -1,0 +1,6 @@
+each item in index
+  if (item.types.length > 0)
+    h5=item.namespace
+    each type in item.types
+      h6 
+        a(href=type.fullName + '.html', title=type.fullName)=type.name

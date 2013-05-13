@@ -1,28 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace NetDoc.Parser.Tests
+﻿namespace NetDoc.Parser.Tests
 {
+    using System.Linq;
+    using Xunit;
+
     public class DocParserTests
     {
-
         [Fact]
         public void ParseTextShouldReturn()
         {
-
         }
 
         [Fact]
         public void ParseFilesShouldReturn()
         {
-            var path = @"D:\Github\facebook-csharp-sdk\facebook-csharp-sdk\Source\Facebook\Facebook-Net45.csproj";
-            var result = DocParser.Parse(path);
-            Assert.NotNull(result);
-        }
+            var namespacesBegins = new string[] 
+                {
+                    "Facebook"
+                }.AsEnumerable();
 
+            var path = @"D:\Github\facebook-csharp-sdk\facebook-csharp-sdk\Source\Facebook\Facebook-Net45.csproj";
+            var docParser = new DocParser();
+            docParser.Parse(path, namespacesBegins);
+            Assert.NotNull(docParser.Data);
+            Assert.True(docParser.Data.Namespaces.Count() > 0);
+        }
     }
 }

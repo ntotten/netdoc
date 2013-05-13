@@ -1,0 +1,14 @@
+if locals.properties && properties.length > 0
+  table
+    tr
+      th(colspan='2') Properties
+    each item in properties
+      tr
+        td
+          span
+           item.type= item.type.displayName
+        td
+          span.itemName
+            span.modifier= item.accessModifier + " "
+            a(href="#"+item.id)=item.name
+          div.itemSummary!=item.summary

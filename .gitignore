@@ -90,3 +90,4 @@ ClientBin/
 
 # Unignore root bin folder
 !/bin/
+/parser
