@@ -1,1 +1,1 @@
-%SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe src\NetDoc.sln /property:Configuration=Release
+"%programfiles(x86)%\MSBuild\14.0\bin\msbuild.exe" src\NetDoc.sln /property:Configuration=Release /m
