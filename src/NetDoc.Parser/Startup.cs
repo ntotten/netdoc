@@ -10,11 +10,11 @@
         public static async Task<string> ParseProjects(Configuration config)
         {
             var docParser = new DocParser();
-            docParser.Parse(config);
+            await docParser.Parse(config);
 
             var settings = new JsonSerializerSettings();
             settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
-            string json = await JsonConvert.SerializeObjectAsync(docParser.Data, Formatting.Indented, settings);
+            string json = JsonConvert.SerializeObject(docParser.Data, Formatting.Indented, settings);
             return json;
         }
 

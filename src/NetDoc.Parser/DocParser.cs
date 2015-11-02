@@ -5,8 +5,10 @@
     using System.IO;
     using System.Linq;
     using NetDoc.Parser.Model;
-    using Roslyn.Compilers;
-    using Roslyn.Compilers.Common;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.MSBuild;
+    using System.Threading.Tasks;
+    using Microsoft.CodeAnalysis.Shared.Utilities;
 
     public class DocParser
     {
@@ -17,28 +19,31 @@
 
         public DocumentData Data { get; set; }
 
-        public void Parse(Configuration config)
+        public async Task Parse(Configuration config)
         {
             foreach (var project in config.Projects)
             {
-                this.Parse(project.Path, config.FilteredNamespaces, !string.IsNullOrEmpty(project.Id) ? project.Id : string.Empty);
+                await this.Parse(project.Path, config.FilteredNamespaces, !string.IsNullOrEmpty(project.Id) ? project.Id : string.Empty);
             }
         }
 
-        public void Parse(string projectPath, IEnumerable<string> namespacesBegins)
+        public async Task Parse(string projectPath, IEnumerable<string> namespacesBegins)
         {
-            this.Parse(projectPath, namespacesBegins, string.Empty);
+            await this.Parse(projectPath, namespacesBegins, string.Empty);
         }
 
-        public void Parse(string projectPath, IEnumerable<string> namespacesBegins, string id)
+        public async Task Parse(string projectPath, IEnumerable<string> namespacesBegins, string id)
         {
-            var workspace = Roslyn.Services.Workspace.LoadStandAloneProject(Path.GetFullPath(projectPath));
-            var compilation = workspace.CurrentSolution.Projects.First().GetCompilation();
+            using (var workspace = MSBuildWorkspace.Create())
+            {
+                var project = await workspace.OpenProjectAsync(projectPath);
+                var compilation = await project.GetCompilationAsync();
 
-            this.Parse(compilation, namespacesBegins, id);
+                this.Parse(compilation, namespacesBegins, id);
+            }
         }
 
-        public void Parse(CommonCompilation compilation, IEnumerable<string> namespacesBegins, string id)
+        public void Parse(Compilation compilation, IEnumerable<string> namespacesBegins, string id)
         {
             if (compilation == null)
             {
@@ -78,7 +83,8 @@
             DocumentationComment comment = null;
             try
             {
-                comment = symbol.GetDocumentationComment();
+                var commentXml = symbol.GetDocumentationCommentXml();
+                comment = DocumentationComment.FromXmlFragment(commentXml);
             }
             catch
             {
@@ -86,8 +92,9 @@
 
             if (comment != null)
             {
-                data.Summary = comment.SummaryTextOpt;
-                data.ReturnDescription = comment.ReturnsTextOpt;
+                // TODO: Parse XML
+                data.Summary = comment.SummaryText;
+                data.ReturnDescription = comment.ReturnsText;
             }
 
             return data;
@@ -172,19 +179,19 @@
             {
                 switch (member.Kind)
                 {
-                    case CommonSymbolKind.Field:
+                    case SymbolKind.Field:
 
                         ParseField(data, (IFieldSymbol)member, data.FullName, id);
                         break;
-                    case CommonSymbolKind.Event:
+                    case SymbolKind.Event:
 
                         ParseEvent(data, (IEventSymbol)member, data.FullName, id);
                         break;
-                    case CommonSymbolKind.Method:
+                    case SymbolKind.Method:
 
                         ParseMethod(data, (IMethodSymbol)member, data.FullName, id);
                         break;
-                    case CommonSymbolKind.Property:
+                    case SymbolKind.Property:
 
                         ParseProperty(data, (IPropertySymbol)member, data.FullName, id);
                         break;
@@ -234,7 +241,7 @@
 
         private static void ParseMethod(NamedTypeDocumentData parent, IMethodSymbol symbol, string rootName, string id)
         {
-            if (symbol.AssociatedPropertyOrEvent != null)
+            if (symbol.AssociatedSymbol != null)
             {
                 // We don't want to include methods that are associated with
                 // events or properties.
@@ -251,7 +258,8 @@
             DocumentationComment comment = null;
             try
             {
-                comment = symbol.GetDocumentationComment();
+                var commentXml = symbol.GetDocumentationCommentXml();
+                comment = DocumentationComment.FromXmlFragment(commentXml);
             }
             catch
             {
@@ -274,7 +282,7 @@
             }
 
             data.GenerateId();
-            if (symbol.MethodKind == CommonMethodKind.Constructor || symbol.MethodKind == CommonMethodKind.StaticConstructor)
+            if (symbol.MethodKind == MethodKind.Constructor || symbol.MethodKind == MethodKind.StaticConstructor)
             {
                 var existingConstructor = parent.GetConstructor(data.Id);
                 if (existingConstructor == null)
@@ -324,10 +332,10 @@
 
         private static bool IsNotVisibleInGeneratedDocumentation(ISymbol symbol)
         {
-            return symbol.DeclaredAccessibility == CommonAccessibility.Private ||
-                symbol.DeclaredAccessibility == CommonAccessibility.Internal ||
-                symbol.DeclaredAccessibility == CommonAccessibility.ProtectedAndInternal ||
-                symbol.DeclaredAccessibility == CommonAccessibility.ProtectedOrInternal;
+            return symbol.DeclaredAccessibility == Accessibility.Private ||
+                symbol.DeclaredAccessibility == Accessibility.Internal ||
+                symbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal ||
+                symbol.DeclaredAccessibility == Accessibility.ProtectedOrInternal;
         }
     }
 }

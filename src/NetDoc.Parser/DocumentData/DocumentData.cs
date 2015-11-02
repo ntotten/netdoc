@@ -1,8 +1,8 @@
 ﻿namespace NetDoc.Parser.Model
 {
+    using Microsoft.CodeAnalysis;
     using System.Collections.Generic;
     using System.Linq;
-    using Roslyn.Compilers.Common;
 
     public class DocumentData
     {

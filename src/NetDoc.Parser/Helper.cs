@@ -1,15 +1,16 @@
 ﻿namespace NetDoc.Parser
 {
-    using Roslyn.Compilers.Common;
+    using System;
+    using Microsoft.CodeAnalysis;
 
     public static class Helper
     {
-        public static string RetrieveAccessModifier(CommonAccessibility declaredAccessibility)
+        public static string RetrieveAccessModifier(Accessibility declaredAccessibility)
         {
             var accessModifier = declaredAccessibility.ToString().ToLowerInvariant();
 
-            if (declaredAccessibility == CommonAccessibility.ProtectedAndInternal ||
-                declaredAccessibility == CommonAccessibility.ProtectedOrInternal)
+            if (declaredAccessibility == Accessibility.ProtectedAndInternal ||
+                declaredAccessibility == Accessibility.ProtectedOrInternal)
             {
                 accessModifier = "protected internal";
             }
